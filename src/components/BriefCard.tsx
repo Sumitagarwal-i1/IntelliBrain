@@ -250,7 +250,7 @@ export function BriefCard({ brief, onDelete }: BriefCardProps) {
         <div className="flex items-center gap-3">
           <button
             onClick={() => copyToClipboard(brief.pitchAngle, 'pitch')}
-            className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white rounded-lg transition-all duration-200 font-medium text-sm flex-1 shadow-lg hover:shadow-violet-500/25"
+            className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r bg-gray-800 hover:bg-gray-700 text-white rounded-lg transition-all duration-200 font-medium text-sm flex-1 shadow-lg hover:shadow-violet-500/25"
           >
             {copiedField === 'pitch' ? (
               <><CheckCircle className="w-4 h-4" /> Copied Pitch!</>

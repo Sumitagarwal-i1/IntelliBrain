@@ -24,7 +24,8 @@ import {
   Search,
   Lightbulb,
   Briefcase,
-  TrendingDown
+  TrendingDown,
+  FileText
 } from 'lucide-react'
 import { Navigation } from '../components/Navigation'
 

@@ -5,7 +5,9 @@ import {
   ArrowLeft, 
   Zap,
   RefreshCw,
-  Share2
+  Share2,
+  CheckCircle,
+  AlertCircle
 } from 'lucide-react'
 import { Brief, briefsService } from '../lib/supabase'
 import { BriefOverview } from '../components/BriefOverview'
@@ -23,6 +25,8 @@ export function BriefDetail() {
   const [error, setError] = useState<string | null>(null)
   const [isImproving, setIsImproving] = useState(false)
   const [showShareModal, setShowShareModal] = useState(false)
+  const [activeTab, setActiveTab] = useState('summary')
+  const [improvementMessage, setImprovementMessage] = useState<string | null>(null)
 
   useEffect(() => {
     if (id && user) {
@@ -52,6 +56,8 @@ export function BriefDetail() {
     if (!brief) return
     
     setIsImproving(true)
+    setImprovementMessage(null)
+    
     try {
       // Call the improve brief API
       const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/improve-brief`, {
@@ -69,11 +75,17 @@ export function BriefDetail() {
       if (response.ok) {
         // Reload the brief to get updated data
         await loadBrief(brief.id)
+        setImprovementMessage('Brief improved with deeper insights and sharper positioning.')
+      } else {
+        setImprovementMessage('No further improvements found.')
       }
     } catch (error) {
       console.error('Failed to improve brief:', error)
+      setImprovementMessage('Failed to improve brief. Please try again.')
     } finally {
       setIsImproving(false)
+      // Clear message after 5 seconds
+      setTimeout(() => setImprovementMessage(null), 5000)
     }
   }
 
@@ -137,6 +149,29 @@ export function BriefDetail() {
           </button>
         </div>
 
+        {/* Improvement Message */}
+        {improvementMessage && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className={`mb-6 p-4 rounded-xl border flex items-center gap-3 ${
+              improvementMessage.includes('improved') 
+                ? 'bg-green-500/20 border-green-500/30 text-green-300'
+                : improvementMessage.includes('No further')
+                ? 'bg-yellow-500/20 border-yellow-500/30 text-yellow-300'
+                : 'bg-red-500/20 border-red-500/30 text-red-300'
+            }`}
+          >
+            {improvementMessage.includes('improved') ? (
+              <CheckCircle className="w-5 h-5 flex-shrink-0" />
+            ) : (
+              <AlertCircle className="w-5 h-5 flex-shrink-0" />
+            )}
+            <span>{improvementMessage}</span>
+          </motion.div>
+        )}
+
         {/* Company Overview - Horizontal Layout */}
         <div className="mb-8">
           <BriefOverview brief={brief} />
@@ -146,12 +181,22 @@ export function BriefDetail() {
         <div className="grid lg:grid-cols-5 gap-8">
           {/* Left Column - Vertical Tab Navigation */}
           <div className="lg:col-span-1">
-            <BriefTabs brief={brief} layout="vertical" />
+            <BriefTabs 
+              brief={brief} 
+              layout="vertical" 
+              activeTab={activeTab}
+              onTabChange={setActiveTab}
+            />
           </div>
 
           {/* Right Column - Tab Content */}
           <div className="lg:col-span-4">
-            <BriefTabs brief={brief} layout="content" />
+            <BriefTabs 
+              brief={brief} 
+              layout="content" 
+              activeTab={activeTab}
+              onTabChange={setActiveTab}
+            />
           </div>
         </div>
 

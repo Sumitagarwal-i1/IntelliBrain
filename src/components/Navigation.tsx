@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { 
-  Brain, 
   Home, 
   FileText, 
   BarChart3, 
@@ -16,7 +15,9 @@ import {
   Plus,
   ChevronDown,
   DollarSign,
-  Crown
+  Crown,
+  MessageCircle,
+  HelpCircle
 } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 
@@ -27,7 +28,6 @@ export function Navigation() {
   const [isProfileOpen, setIsProfileOpen] = useState(false)
 
   const navItems = [
-    // { path: '/', label: 'Home', icon: Home }
     { path: '/app', label: 'Briefs', icon: FileText },
     { path: '/analytics', label: 'Analytics', icon: BarChart3 },
     { path: '/pricing', label: 'Pricing', icon: DollarSign },
@@ -52,10 +52,14 @@ export function Navigation() {
           {/* Logo */}
           <Link to="/" className="flex items-center gap-3 group">
             <motion.div
-              whileHover={{ scale: 1.05, rotate: 5 }}
-              className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg"
+              whileHover={{ scale: 1.05 }}
+              className="w-10 h-10 flex items-center justify-center"
             >
-              <Brain className="w-6 h-6 text-white" />
+              <img 
+                src="/ChatGPT Image Jul 3, 2025, 06_33_42 PM.png" 
+                alt="PitchIntel Logo"
+                className="w-10 h-10 object-contain"
+              />
             </motion.div>
             <div className="hidden sm:block">
               <span className="text-xl font-bold text-white group-hover:text-blue-400 transition-colors">
@@ -68,7 +72,6 @@ export function Navigation() {
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-1">
             {navItems.map((item) => {
-              
               const active = isActive(item.path)
               
               return (
@@ -81,7 +84,6 @@ export function Navigation() {
                       : 'text-gray-400 hover:text-white hover:bg-gray-800/50'
                   }`}
                 >
-                  {/* <Icon className="w-4 h-4" /> */}
                   {item.label}
                 </Link>
               )
@@ -101,19 +103,6 @@ export function Navigation() {
               </Link>
             )}
 
-            
-            {/* <a
-              href="https://bolt.new"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-orange-500/20 to-red-500/20 border border-orange-500/30 rounded-full text-orange-300 hover:text-orange-200 transition-colors text-xs font-medium"
-            > */}
-              {/* <span>Built with</span>
-              <span className="font-bold">bolt.new</span>
-              <ExternalLink className="w-3 h-3" /> */}
-            {/* </a> */}
-
-            
             {user && (
               <div className="relative">
                 <motion.button
@@ -147,6 +136,22 @@ export function Navigation() {
                       >
                         <Crown className="w-4 h-4" />
                         Upgrade Plan
+                      </Link>
+                      <Link
+                        to="/help"
+                        className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-300 hover:bg-gray-800/50 hover:text-white transition-colors"
+                        onClick={() => setIsProfileOpen(false)}
+                      >
+                        <HelpCircle className="w-4 h-4" />
+                        Help Center
+                      </Link>
+                      <Link
+                        to="/contact"
+                        className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-300 hover:bg-gray-800/50 hover:text-white transition-colors"
+                        onClick={() => setIsProfileOpen(false)}
+                      >
+                        <MessageCircle className="w-4 h-4" />
+                        Contact
                       </Link>
                       <Link
                         to="/settings"

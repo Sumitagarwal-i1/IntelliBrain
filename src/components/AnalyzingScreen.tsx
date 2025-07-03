@@ -100,9 +100,13 @@ export function AnalyzingScreen({ companyName, website }: AnalyzingScreenProps) 
                 repeat: Infinity,
                 ease: "easeInOut"
               }}
-              className="w-20 h-20 bg-gradient-to-r from-primary-500 to-violet-500 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-primary-500/25"
+              className="w-20 h-20 flex items-center justify-center mx-auto mb-6 shadow-2xl"
             >
-              <Satellite className="w-10 h-10 text-white" />
+              <img 
+                src="/ChatGPT Image Jul 3, 2025, 06_37_50 PM.png" 
+                alt="PitchIntel Logo"
+                className="w-20 h-20 object-contain"
+              />
             </motion.div>
             
             <motion.h3 

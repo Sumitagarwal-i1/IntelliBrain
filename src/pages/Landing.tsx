@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import { 
-  Brain, 
   TrendingUp, 
   Target, 
   Zap, 
@@ -16,13 +15,23 @@ import {
   Pause,
   RotateCcw,
   Heart,
-  BarChart3
+  BarChart3,
+  CheckCircle,
+  ChevronDown,
+  ChevronUp,
+  UserCheck,
+  PieChart,
+  Search,
+  Lightbulb,
+  Briefcase,
+  TrendingDown
 } from 'lucide-react'
 import { Navigation } from '../components/Navigation'
 
 export function Landing() {
   const [currentDemo, setCurrentDemo] = useState(0)
   const [isPlaying, setIsPlaying] = useState(true)
+  const [openFaq, setOpenFaq] = useState<number | null>(null)
 
   const demoSteps = [
     {
@@ -76,6 +85,126 @@ export function Landing() {
     }
   ]
 
+  const audienceCards = [
+    {
+      icon: Lightbulb,
+      title: 'Founders',
+      description: 'Research potential partners, investors, and acquisition targets with comprehensive intelligence.',
+      color: 'yellow'
+    },
+    {
+      icon: BarChart3,
+      title: 'Analysts',
+      description: 'Generate detailed market research and competitive analysis reports in minutes.',
+      color: 'blue'
+    },
+    {
+      icon: Users,
+      title: 'Sales Teams',
+      description: 'Craft personalized outreach strategies with real-time company insights and signals.',
+      color: 'green'
+    },
+    {
+      icon: Briefcase,
+      title: 'Agencies',
+      description: 'Deliver premium intelligence reports to clients with professional-grade analysis.',
+      color: 'purple'
+    }
+  ]
+
+  const useCases = [
+    {
+      title: 'Partnership Development',
+      description: 'Identify strategic partnership opportunities and craft compelling proposals.',
+      icon: Building2,
+      color: 'blue'
+    },
+    {
+      title: 'Investment Research',
+      description: 'Analyze potential investments with comprehensive market and company intelligence.',
+      icon: TrendingUp,
+      color: 'green'
+    },
+    {
+      title: 'Competitive Analysis',
+      description: 'Monitor competitors and identify market positioning opportunities.',
+      icon: Search,
+      color: 'purple'
+    },
+    {
+      title: 'Client Acquisition',
+      description: 'Research prospects and create personalized outreach campaigns that convert.',
+      icon: Target,
+      color: 'orange'
+    }
+  ]
+
+  const howItWorksSteps = [
+    {
+      step: 1,
+      title: 'Enter Company & Intent',
+      description: 'Input target company details and describe your strategic objective.',
+      icon: Building2,
+      color: 'blue'
+    },
+    {
+      step: 2,
+      title: 'AI Research',
+      description: 'Our AI analyzes real-time data from news, jobs, stock, and social sources.',
+      icon: Zap,
+      color: 'purple'
+    },
+    {
+      step: 3,
+      title: 'Brief Output',
+      description: 'Receive comprehensive strategic brief with actionable insights and recommendations.',
+      icon: FileText,
+      color: 'green'
+    }
+  ]
+
+  const faqs = [
+    {
+      category: 'Getting Started',
+      questions: [
+        {
+          question: 'How do I create my first brief?',
+          answer: 'Simply click "Start Free Now", enter a company name and your strategic intent, then let our AI generate comprehensive insights in minutes.'
+        },
+        {
+          question: 'What data sources does PitchIntel use?',
+          answer: 'We integrate with NewsData.io for real-time news, JSearch for job postings, Yahoo Finance for stock data, Twinword for NLP analysis, and Clearbit for company metadata.'
+        }
+      ]
+    },
+    {
+      category: 'Plans & Billing',
+      questions: [
+        {
+          question: 'Is there a free plan?',
+          answer: 'Yes! Our free plan includes 5 briefs per month with basic AI analysis, news intelligence, and job signals.'
+        },
+        {
+          question: 'Can I upgrade or downgrade anytime?',
+          answer: 'Absolutely. You can change your plan at any time, and changes take effect immediately.'
+        }
+      ]
+    },
+    {
+      category: 'Account',
+      questions: [
+        {
+          question: 'How secure is my data?',
+          answer: 'We use enterprise-grade security with encryption in transit and at rest. Your data is never shared with third parties.'
+        },
+        {
+          question: 'Can I export my briefs?',
+          answer: 'Yes, Pro users can export briefs as PDF/HTML and share them with team members or clients.'
+        }
+      ]
+    }
+  ]
+
   const DemoVisual = ({ type }: { type: string }) => {
     switch (type) {
       case 'form-input':
@@ -110,9 +239,13 @@ export function Landing() {
               <motion.div
                 animate={{ rotate: 360 }}
                 transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center mx-auto mb-4"
+                className="w-12 h-12 flex items-center justify-center mx-auto mb-4"
               >
-                <Brain className="w-6 h-6 text-white" />
+                <img 
+                  src="/ChatGPT Image Jul 3, 2025, 06_37_50 PM.png" 
+                  alt="PitchIntel Logo"
+                  className="w-12 h-12 object-contain"
+                />
               </motion.div>
               <div className="text-white font-medium">Analyzing Shopify</div>
             </div>
@@ -221,7 +354,7 @@ export function Landing() {
                   className="inline-flex items-center justify-center gap-3 px-8 py-4 bg-blue-600 hover:bg-blue-500 rounded-xl font-semibold text-lg transition-all duration-200 shadow-xl hover:shadow-blue-500/25 hover:scale-105"
                 >
                   <Sparkles className="w-5 h-5" />
-                  Create Your First Brief
+                  Start Free Now
                   <ArrowRight className="w-5 h-5" />
                 </Link>
                 
@@ -322,6 +455,124 @@ export function Landing() {
           </motion.div>
         </div>
 
+        {/* Audience Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6 }}
+          className="mt-32 mb-20"
+        >
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-white mb-4">
+              Built to Empower Forward-Thinking Teams
+            </h2>
+            <p className="text-xl text-gray-400 max-w-3xl mx-auto">
+              From startup founders to enterprise sales teams, PitchIntel delivers the intelligence you need to make informed decisions.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {audienceCards.map((card, index) => {
+              const Icon = card.icon
+              return (
+                <motion.div
+                  key={card.title}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.8 + index * 0.1 }}
+                  className="bg-gray-900/50 backdrop-blur border border-gray-800 rounded-2xl p-6 text-center hover:border-gray-700 transition-all duration-300 group hover:scale-105"
+                >
+                  <div className={`w-16 h-16 bg-${card.color}-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300`}>
+                    <Icon className={`w-8 h-8 text-${card.color}-400`} />
+                  </div>
+                  <h3 className="text-xl font-semibold text-white mb-3">{card.title}</h3>
+                  <p className="text-gray-400 leading-relaxed">{card.description}</p>
+                </motion.div>
+              )
+            })}
+          </div>
+        </motion.div>
+
+        {/* Use Cases Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1.0 }}
+          className="mb-20"
+        >
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-white mb-4">
+              Who Is PitchIntel For?
+            </h2>
+            <p className="text-xl text-gray-400 max-w-3xl mx-auto">
+              Discover how different teams leverage AI-powered intelligence for strategic advantage.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-8">
+            {useCases.map((useCase, index) => {
+              const Icon = useCase.icon
+              return (
+                <motion.div
+                  key={useCase.title}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 1.2 + index * 0.1 }}
+                  className="bg-gray-900/50 backdrop-blur border border-gray-800 rounded-2xl p-8 hover:border-gray-700 transition-all duration-300 group"
+                >
+                  <div className={`w-12 h-12 bg-${useCase.color}-500/20 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300`}>
+                    <Icon className={`w-6 h-6 text-${useCase.color}-400`} />
+                  </div>
+                  <h3 className="text-xl font-semibold text-white mb-3">{useCase.title}</h3>
+                  <p className="text-gray-400 leading-relaxed">{useCase.description}</p>
+                </motion.div>
+              )
+            })}
+          </div>
+        </motion.div>
+
+        {/* How It Works Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1.4 }}
+          className="mb-20"
+        >
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-white mb-4">
+              How It Works
+            </h2>
+            <p className="text-xl text-gray-400 max-w-3xl mx-auto">
+              Three simple steps to generate comprehensive strategic intelligence.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {howItWorksSteps.map((step, index) => {
+              const Icon = step.icon
+              return (
+                <motion.div
+                  key={step.step}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 1.6 + index * 0.2 }}
+                  className="text-center relative"
+                >
+                  {index < howItWorksSteps.length - 1 && (
+                    <div className="hidden md:block absolute top-12 left-1/2 w-full h-0.5 bg-gradient-to-r from-gray-600 to-gray-800 transform translate-x-1/2" />
+                  )}
+                  <div className={`w-24 h-24 bg-${step.color}-500/20 rounded-2xl flex items-center justify-center mx-auto mb-6 relative z-10 border-4 border-gray-900`}>
+                    <Icon className={`w-10 h-10 text-${step.color}-400`} />
+                  </div>
+                  <div className={`text-sm font-bold text-${step.color}-400 mb-2`}>STEP {step.step}</div>
+                  <h3 className="text-xl font-semibold text-white mb-3">{step.title}</h3>
+                  <p className="text-gray-400 leading-relaxed">{step.description}</p>
+                </motion.div>
+              )
+            })}
+          </div>
+        </motion.div>
+
         {/* Features Grid */}
         <div className="grid md:grid-cols-3 gap-8 mt-20 mb-16">
           {features.map((feature, index) => {
@@ -353,16 +604,80 @@ export function Landing() {
           })}
         </div>
 
-        {/* CTA Section */}
+        {/* FAQ Section */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.4 }}
+          transition={{ delay: 1.8 }}
+          className="mb-20"
+        >
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-white mb-4">
+              Frequently Asked Questions
+            </h2>
+            <p className="text-xl text-gray-400 max-w-3xl mx-auto">
+              Everything you need to know about PitchIntel and how it works.
+            </p>
+          </div>
+
+          <div className="max-w-4xl mx-auto space-y-8">
+            {faqs.map((category, categoryIndex) => (
+              <div key={category.category} className="bg-gray-900/50 backdrop-blur border border-gray-800 rounded-2xl p-6">
+                <h3 className="text-xl font-semibold text-white mb-6">{category.category}</h3>
+                <div className="space-y-4">
+                  {category.questions.map((faq, faqIndex) => {
+                    const faqId = categoryIndex * 100 + faqIndex
+                    const isOpen = openFaq === faqId
+                    
+                    return (
+                      <div key={faqIndex} className="border border-gray-700 rounded-xl overflow-hidden">
+                        <button
+                          onClick={() => setOpenFaq(isOpen ? null : faqId)}
+                          className="w-full flex items-center justify-between p-4 text-left hover:bg-gray-800/50 transition-colors"
+                        >
+                          <span className="font-medium text-white">{faq.question}</span>
+                          {isOpen ? (
+                            <ChevronUp className="w-5 h-5 text-gray-400" />
+                          ) : (
+                            <ChevronDown className="w-5 h-5 text-gray-400" />
+                          )}
+                        </button>
+                        <AnimatePresence>
+                          {isOpen && (
+                            <motion.div
+                              initial={{ height: 0, opacity: 0 }}
+                              animate={{ height: 'auto', opacity: 1 }}
+                              exit={{ height: 0, opacity: 0 }}
+                              transition={{ duration: 0.3 }}
+                              className="overflow-hidden"
+                            >
+                              <div className="p-4 pt-0 text-gray-400 leading-relaxed">
+                                {faq.answer}
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* Final CTA Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 2.0 }}
           className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/20 rounded-2xl p-8 text-center"
         >
-          <h2 className="text-3xl font-bold mb-4">Ready to Transform Your B2B Intelligence?</h2>
-          <p className="text-gray-300 mb-6 text-lg max-w-2xl mx-auto">
-            Join forward-thinking teams using real-time AI intelligence to close more deals with precision and confidence.
+          <h2 className="text-4xl font-bold text-white mb-4">
+            Ready to Create Your First Strategic Brief?
+          </h2>
+          <p className="text-gray-300 mb-8 text-lg max-w-2xl mx-auto">
+            Join thousands of professionals using PitchIntel to make smarter business decisions with AI-powered intelligence.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
@@ -370,15 +685,12 @@ export function Landing() {
               className="inline-flex items-center gap-2 px-8 py-4 bg-blue-600 hover:bg-blue-500 rounded-xl font-semibold text-lg transition-all duration-200 hover:scale-105"
             >
               <Zap className="w-5 h-5" />
-              Start Free Analysis
+              Start Free Now
             </Link>
-            <Link
-              to="/docs"
-              className="inline-flex items-center gap-2 px-8 py-4 bg-gray-800 hover:bg-gray-700 border border-gray-700 hover:border-gray-600 text-gray-300 hover:text-white rounded-xl font-semibold text-lg transition-all duration-200"
-            >
-              <Brain className="w-5 h-5" />
-              View Documentation
-            </Link>
+            <button className="inline-flex items-center gap-2 px-8 py-4 bg-gray-800 hover:bg-gray-700 border border-gray-700 hover:border-gray-600 text-gray-300 hover:text-white rounded-xl font-semibold text-lg transition-all duration-200">
+              <Play className="w-5 h-5" />
+              Watch Demo
+            </button>
           </div>
         </motion.div>
       </main>

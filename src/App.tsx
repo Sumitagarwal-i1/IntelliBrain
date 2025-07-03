@@ -8,6 +8,8 @@ import { Analytics } from './pages/Analytics'
 import { Settings } from './pages/Settings'
 import { Docs } from './pages/Docs'
 import { Pricing } from './pages/Pricing'
+import { Contact } from './pages/Contact'
+import { Help } from './pages/Help'
 
 function App() {
   return (
@@ -17,6 +19,8 @@ function App() {
           <Route path="/" element={<Landing />} />
           <Route path="/docs" element={<Docs />} />
           <Route path="/pricing" element={<Pricing />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/help" element={<Help />} />
           <Route path="/app" element={
             <AuthGuard>
               <AppPage />

@@ -31,12 +31,25 @@ import { IntelligenceSources } from './IntelligenceSources'
 interface BriefTabsProps {
   brief: Brief
   layout?: 'vertical' | 'content' | 'horizontal'
+  activeTab?: string
+  onTabChange?: (tabId: string) => void
 }
 
-export function BriefTabs({ brief, layout = 'horizontal' }: BriefTabsProps) {
-  const [activeTab, setActiveTab] = useState('summary')
+export function BriefTabs({ brief, layout = 'horizontal', activeTab: externalActiveTab, onTabChange }: BriefTabsProps) {
+  const [internalActiveTab, setInternalActiveTab] = useState('summary')
   const [copiedField, setCopiedField] = useState<string | null>(null)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+
+  // Use external activeTab if provided, otherwise use internal state
+  const activeTab = externalActiveTab || internalActiveTab
+
+  const handleTabChange = (tabId: string) => {
+    if (onTabChange) {
+      onTabChange(tabId)
+    } else {
+      setInternalActiveTab(tabId)
+    }
+  }
 
   const copyToClipboard = async (text: string, field: string) => {
     try {
@@ -390,7 +403,7 @@ export function BriefTabs({ brief, layout = 'horizontal' }: BriefTabsProps) {
                     <button
                       key={tab.id}
                       onClick={() => {
-                        setActiveTab(tab.id)
+                        handleTabChange(tab.id)
                         setIsMobileMenuOpen(false)
                       }}
                       className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-all duration-200 text-left ${
@@ -423,7 +436,7 @@ export function BriefTabs({ brief, layout = 'horizontal' }: BriefTabsProps) {
             return (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
+                onClick={() => handleTabChange(tab.id)}
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 text-left ${
                   isActive 
                     ? `${getTabColor(tab.color, true)} border` 
@@ -470,7 +483,7 @@ export function BriefTabs({ brief, layout = 'horizontal' }: BriefTabsProps) {
               return (
                 <button
                   key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
+                  onClick={() => handleTabChange(tab.id)}
                   className={`flex items-center gap-2 px-4 py-3 rounded-t-xl font-medium transition-all duration-200 border-b-2 ${
                     isActive 
                       ? `${getTabColor(tab.color, true)} border-current` 

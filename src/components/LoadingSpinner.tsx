@@ -1,5 +1,4 @@
 import { motion } from 'framer-motion'
-import { Brain } from 'lucide-react'
 
 export function LoadingSpinner() {
   return (
@@ -18,9 +17,13 @@ export function LoadingSpinner() {
             rotate: { duration: 2, repeat: Infinity, ease: "linear" },
             scale: { duration: 1, repeat: Infinity, ease: "easeInOut" }
           }}
-          className="w-16 h-16 bg-primary-500 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-primary-500/25"
+          className="w-16 h-16 flex items-center justify-center mx-auto mb-6 shadow-2xl"
         >
-          <Brain className="w-8 h-8 text-white" />
+          <img 
+            src="/ChatGPT Image Jul 3, 2025, 06_37_50 PM.png" 
+            alt="PitchIntel Logo"
+            className="w-16 h-16 object-contain"
+          />
         </motion.div>
         
         <motion.h3 
@@ -28,7 +31,7 @@ export function LoadingSpinner() {
           animate={{ opacity: [0.7, 1, 0.7] }}
           transition={{ duration: 2, repeat: Infinity }}
         >
-          Loading IntelliBrief
+          Loading PitchIntel
         </motion.h3>
         
         <div className="flex items-center justify-center gap-1">

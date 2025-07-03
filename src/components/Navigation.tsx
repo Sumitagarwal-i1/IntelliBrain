@@ -111,9 +111,9 @@ export function Navigation() {
               {/* <span>Built with</span>
               <span className="font-bold">bolt.new</span>
               <ExternalLink className="w-3 h-3" /> */}
-            </a>
+            {/* </a> */}
 
-            {/* Profile Dropdown */}
+            
             {user && (
               <div className="relative">
                 <motion.button

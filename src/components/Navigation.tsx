@@ -84,8 +84,8 @@ export function Navigation() {
               )
             })}
             
-            {/* New Brief Button */}
-            {user && (
+            {/* {/* New Brief Button */}
+            {/* {user && (
               <Link
                 to="/app?new=true"
                 className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-medium transition-all duration-200 ml-2"
@@ -93,7 +93,7 @@ export function Navigation() {
                 <Plus className="w-4 h-4" />
                 New Brief
               </Link>
-            )}
+            )} */
           </div>
 
           {/* Right Side Actions */}

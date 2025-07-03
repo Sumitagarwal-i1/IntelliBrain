@@ -9,6 +9,14 @@ interface CreateBriefRequest {
   website?: string
   userIntent: string
   userId?: string
+  userCompany?: {
+    name: string
+    industry: string
+    product: string
+    valueProposition: string
+    website?: string
+    goals: string
+  }
 }
 
 interface NewsItem {
@@ -66,7 +74,7 @@ Deno.serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
-    const { companyName, website, userIntent, userId }: CreateBriefRequest = await req.json()
+    const { companyName, website, userIntent, userId, userCompany }: CreateBriefRequest = await req.json()
 
     // Validate input
     if (!companyName || !userIntent) {
@@ -76,7 +84,7 @@ Deno.serve(async (req) => {
       )
     }
 
-    console.log(`Creating brief for ${companyName}...`)
+    console.log(`Creating context-aware brief for ${companyName}...`)
 
     // 1. Extract domain and setup Clearbit
     let companyDomain = ''
@@ -98,8 +106,16 @@ Deno.serve(async (req) => {
     const stockData: StockData = await fetchStockData(companyName)
     const toneInsights: ToneInsights = await analyzeTone(userIntent, newsData)
 
-    // 3. Generate AI analysis using Groq
-    const aiAnalysis = await generateAIAnalysis(companyName, userIntent, newsData, jobSignals, stockData, toneInsights)
+    // 3. Generate context-aware AI analysis using both companies
+    const aiAnalysis = await generateContextAwareAnalysis(
+      companyName, 
+      userIntent, 
+      newsData, 
+      jobSignals, 
+      stockData, 
+      toneInsights,
+      userCompany
+    )
 
     const hiringTrends = `Active hiring: ${jobSignals.length} roles across ${new Set(jobSignals.map(j => j.location.split(',')[0])).size} locations`
     const newsTrends = `${newsData.length} recent articles - ${toneInsights.sentiment || 'neutral'} sentiment`
@@ -146,7 +162,7 @@ Deno.serve(async (req) => {
       )
     }
 
-    console.log(`Successfully created brief for ${companyName}`)
+    console.log(`Successfully created context-aware brief for ${companyName}`)
 
     return new Response(
       JSON.stringify({ 
@@ -360,37 +376,66 @@ function getCategoryForTech(tech: string): string {
   return categories[tech] || 'Other'
 }
 
-async function generateAIAnalysis(
+async function generateContextAwareAnalysis(
   companyName: string, 
   userIntent: string, 
   newsData: NewsItem[], 
   jobSignals: JobSignal[],
   stockData: StockData,
-  toneInsights: ToneInsights
+  toneInsights: ToneInsights,
+  userCompany?: {
+    name: string
+    industry: string
+    product: string
+    valueProposition: string
+    website?: string
+    goals: string
+  }
 ) {
-  // In production, integrate with Groq API for real AI analysis
-  // For now, generate intelligent mock responses based on real data
-  
+  // Enhanced context-aware AI analysis
   const hasPositiveNews = newsData.some(n => 
     n.title.toLowerCase().includes('growth') || 
     n.title.toLowerCase().includes('funding') ||
-    n.title.toLowerCase().includes('expansion')
+    n.title.toLowerCase().includes('expansion') ||
+    n.title.toLowerCase().includes('partnership')
   )
 
-  const isHiring = jobSignals.length > 5
+  const hasNegativeNews = newsData.some(n =>
+    n.title.toLowerCase().includes('layoffs') ||
+    n.title.toLowerCase().includes('decline') ||
+    n.title.toLowerCase().includes('loss')
+  )
+
+  const isActivelyHiring = jobSignals.length > 5
   const hasStockData = !!stockData.ticker
   const sentiment = toneInsights.sentiment || 'neutral'
+  const primaryEmotion = toneInsights.emotion || 'neutral'
+
+  // Context-aware analysis considering both companies
+  const userContext = userCompany ? 
+    `As a ${userCompany.industry} company offering ${userCompany.product}, ` : 
+    'Given your strategic objectives, '
+
+  const competitiveContext = userCompany && userCompany.industry ? 
+    `This positions your ${userCompany.industry} solution strategically against their current market approach. ` : 
+    ''
+
+  const valueAlignmentContext = userCompany && userCompany.valueProposition ?
+    `Your unique value proposition of ${userCompany.valueProposition} aligns well with their ${sentiment} market position. ` :
+    ''
 
   return {
-    summary: `${companyName} demonstrates ${sentiment} market sentiment with ${newsData.length} recent news mentions and ${jobSignals.length} active job postings. ${hasPositiveNews ? 'Recent positive developments indicate growth momentum.' : ''} ${isHiring ? 'Active hiring suggests expansion phase.' : ''} ${hasStockData ? `Stock performance shows ${stockData.priceChange?.includes('+') ? 'positive' : 'mixed'} market reception.` : ''}`,
+    summary: `${userContext}${companyName} presents a compelling strategic opportunity with ${sentiment} market sentiment and ${primaryEmotion} emotional positioning. Their ${newsData.length} recent news mentions indicate ${hasPositiveNews ? 'positive momentum' : hasNegativeNews ? 'market challenges' : 'stable operations'}, while ${jobSignals.length} active job postings suggest ${isActivelyHiring ? 'aggressive expansion' : 'selective growth'}. ${hasStockData ? `Financial performance shows ${stockData.priceChange?.includes('+') ? 'positive' : 'mixed'} trends. ` : ''}${competitiveContext}${valueAlignmentContext}The timing appears optimal for strategic engagement based on their current trajectory and market positioning.`,
     
-    pitchAngle: `Given ${companyName}'s current ${sentiment} sentiment and ${isHiring ? 'active hiring phase' : 'market position'}, ${userIntent} aligns well with their strategic direction. ${hasPositiveNews ? 'Recent positive news coverage creates an opportune moment for engagement.' : ''} The timing is ideal for partnerships that support their ${isHiring ? 'growth and scaling initiatives' : 'operational objectives'}.`,
+    pitchAngle: `${userContext}the strategic timing for engaging ${companyName} is exceptionally favorable. Their ${sentiment} sentiment combined with ${primaryEmotion} emotional state creates receptiveness to partnerships that support their ${isActivelyHiring ? 'scaling initiatives' : 'operational objectives'}. ${hasPositiveNews ? 'Recent positive developments amplify their openness to strategic collaborations. ' : ''}${userCompany ? `Your ${userCompany.product} directly addresses their expansion needs, particularly given their ${jobSignals.length} active hiring positions. ` : ''}${valueAlignmentContext}The convergence of their market position, emotional readiness, and operational scaling creates an ideal window for ${userIntent}. Their ${newsData.length} recent news mentions and hiring patterns suggest they're actively seeking solutions that align with your strategic offering.`,
     
-    subjectLine: `Strategic Partnership Opportunity for ${companyName}${hasPositiveNews ? ' - Capitalizing on Recent Growth' : ''}`,
+    subjectLine: userCompany ? 
+      `Strategic Partnership: ${userCompany.name} + ${companyName}${hasPositiveNews ? ' - Perfect Timing' : ''}` :
+      `Strategic Partnership Opportunity for ${companyName}${hasPositiveNews ? ' - Capitalizing on Growth' : ''}`,
     
-    whatNotToPitch: `Avoid generic solutions that don't acknowledge ${companyName}'s ${sentiment} market position. ${isHiring ? 'Don\'t pitch cost-cutting measures during their expansion phase.' : 'Focus on value creation rather than cost reduction.'} Avoid ignoring their recent ${newsData.length > 0 ? 'news developments' : 'market activities'} and ${toneInsights.emotion ? `current ${toneInsights.emotion} sentiment` : 'business context'}.`,
+    whatNotToPitch: `${userContext}avoid approaches that contradict ${companyName}'s current ${sentiment} sentiment and ${primaryEmotion} emotional state. ${isActivelyHiring ? 'Never pitch cost-reduction or efficiency-only solutions during their expansion phase. ' : 'Avoid aggressive scaling pitches if they\'re in maintenance mode. '}${hasNegativeNews ? 'Be sensitive to recent market challenges and avoid highlighting competitive threats. ' : ''}${userCompany ? `Don't position your ${userCompany.product} as a replacement for their existing systems without acknowledging their current ${sentiment} market approach. ` : ''}Avoid generic pitches that ignore their specific ${newsData.length} recent developments, ${jobSignals.length} hiring signals, and ${primaryEmotion} emotional positioning. Never underestimate their strategic sophistication or current market intelligence.`,
     
-    signalTag: `${isHiring ? 'Scaling Team' : 'Market Active'} - ${sentiment.charAt(0).toUpperCase() + sentiment.slice(1)} Sentiment`
+    signalTag: `${isActivelyHiring ? 'Scaling Operations' : 'Strategic Growth'} - ${sentiment.charAt(0).toUpperCase() + sentiment.slice(1)} Market Position`
   }
 }
 

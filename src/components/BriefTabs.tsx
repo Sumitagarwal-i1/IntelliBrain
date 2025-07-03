@@ -373,10 +373,10 @@ export function BriefTabs({ brief, layout = 'horizontal', activeTab: externalAct
     }
   }
 
-  // Vertical Tab Navigation (Left Sidebar)
+  // Vertical Tab Navigation (Left Sidebar) - Fixed height without scrollbar
   if (layout === 'vertical') {
     return (
-      <div className="space-y-2">
+      <div className="space-y-2 h-fit">
         {/* Mobile Dropdown */}
         <div className="lg:hidden">
           <button
@@ -427,8 +427,8 @@ export function BriefTabs({ brief, layout = 'horizontal', activeTab: externalAct
           </AnimatePresence>
         </div>
 
-        {/* Desktop Vertical Navigation */}
-        <div className="hidden lg:block space-y-2 max-h-[calc(100vh-200px)] overflow-y-auto">
+        {/* Desktop Vertical Navigation - Fixed height, no scrollbar */}
+        <div className="hidden lg:block space-y-2 min-h-fit">
           {tabs.map((tab) => {
             const Icon = tab.icon
             const isActive = activeTab === tab.id

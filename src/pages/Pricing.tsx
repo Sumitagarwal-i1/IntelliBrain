@@ -14,7 +14,9 @@ import {
   Linkedin,
   Database,
   Brain,
-  Shield
+  Shield,
+  Clock,
+  Gift
 } from 'lucide-react'
 import { Navigation } from '../components/Navigation'
 import { Link } from 'react-router-dom'
@@ -116,6 +118,28 @@ export function Pricing() {
       <Navigation />
       
       <div className="pt-24 container mx-auto px-4 py-16">
+        {/* 30-Day Free Access Banner */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-gradient-to-r from-green-500/20 to-emerald-500/20 border border-green-500/30 rounded-2xl p-6 mb-12 text-center"
+        >
+          <div className="flex items-center justify-center gap-3 mb-3">
+            <Gift className="w-6 h-6 text-green-400" />
+            <Clock className="w-6 h-6 text-green-400" />
+          </div>
+          <h3 className="text-2xl font-bold text-green-300 mb-2">
+            🕒 Enjoy full access — free for 30 days!
+          </h3>
+          <p className="text-green-400 text-lg">
+            No credit card required. Experience all Pro features during your trial period.
+          </p>
+          <div className="mt-4 inline-flex items-center gap-2 bg-green-500/20 border border-green-500/30 rounded-full px-4 py-2">
+            <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse" />
+            <span className="text-green-300 font-medium">29 days remaining</span>
+          </div>
+        </motion.div>
+
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -230,16 +254,23 @@ export function Pricing() {
                 </div>
 
                 <button
-                  className={`w-full py-3 px-6 rounded-xl font-semibold transition-all duration-200 flex items-center justify-center gap-2 ${
+                  className={`w-full py-3 px-6 rounded-xl font-semibold transition-all duration-200 flex items-center justify-center gap-2 relative group ${
                     plan.popular
                       ? 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white shadow-lg hover:shadow-blue-500/25'
                       : plan.name === 'Enterprise'
                       ? 'bg-purple-600 hover:bg-purple-500 text-white'
                       : 'bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white border border-gray-700 hover:border-gray-600'
                   }`}
+                  title="🚀 Everything is free for 30 days — no billing yet!"
                 >
                   {plan.cta}
                   <ArrowRight className="w-4 h-4" />
+                  
+                  {/* Tooltip */}
+                  <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-800 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-10">
+                    🚀 Everything is free for 30 days — no billing yet!
+                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-800" />
+                  </div>
                 </button>
               </motion.div>
             )

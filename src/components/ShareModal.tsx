@@ -121,24 +121,49 @@ export function ShareModal({ brief, isOpen, onClose }: ShareModalProps) {
   const handleLinkedInPost = async () => {
     setIsGeneratingLinkedIn(true)
     try {
-      // Generate LinkedIn post content
-      const linkedInText = `🎯 Just completed a strategic intelligence brief for ${brief.companyName}
+      // Generate comprehensive LinkedIn post content
+      const briefSummary = brief.summary.length > 100 
+        ? brief.summary.substring(0, 100) + '...' 
+        : brief.summary
 
-📊 Key Insights:
+      const linkedInText = `🚀 Just ran a strategic brief on ${brief.companyName} using PitchIntel — brilliant AI-driven insights!
+
+📊 Key Intelligence:
 • ${brief.news?.length || 0} recent news articles analyzed
-• ${brief.jobSignals?.length || 0} hiring signals detected
+• ${brief.jobSignals?.length || 0} hiring signals detected  
 • ${brief.techStack?.length || 0} technologies identified
+${brief.stockData?.ticker ? `• Stock analysis: ${brief.stockData.priceChange || 'N/A'}` : ''}
 
-💡 Strategic Summary: ${brief.summary.substring(0, 200)}...
+💡 Strategic Summary: ${briefSummary}
 
 ${brief.toneInsights?.sentiment ? `📈 Market Sentiment: ${brief.toneInsights.sentiment}` : ''}
 
-#B2B #SalesIntelligence #AI #PitchIntel #BusinessDevelopment #SalesStrategy`
+👉 Check it out: ${shareUrl}
 
+#B2BIntelligence #AIPowered #SalesStrategy #BusinessDevelopment #PitchIntel`
+
+      // Use LinkedIn's sharing API with proper encoding
       const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}&summary=${encodeURIComponent(linkedInText)}`
-      window.open(linkedInUrl, '_blank', 'width=600,height=600')
+      
+      // Open LinkedIn sharing in new window
+      const popup = window.open(linkedInUrl, '_blank', 'width=600,height=600,scrollbars=yes,resizable=yes')
+      
+      // Check if popup was blocked
+      if (!popup) {
+        // Fallback: copy to clipboard
+        await navigator.clipboard.writeText(linkedInText)
+        alert('LinkedIn sharing popup was blocked. The post content has been copied to your clipboard!')
+      }
     } catch (error) {
       console.error('Failed to generate LinkedIn post:', error)
+      // Fallback: copy basic text
+      try {
+        const fallbackText = `🚀 Just analyzed ${brief.companyName} using PitchIntel AI! Check out the insights: ${shareUrl} #B2BIntelligence #AI`
+        await navigator.clipboard.writeText(fallbackText)
+        alert('LinkedIn sharing failed, but the post content has been copied to your clipboard!')
+      } catch (clipboardError) {
+        alert('LinkedIn sharing failed. Please try again.')
+      }
     } finally {
       setIsGeneratingLinkedIn(false)
     }

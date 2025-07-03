@@ -29,6 +29,8 @@ export type Brief = {
   hiringTrends?: string
   newsTrends?: string
   userId?: string
+  stockData?: StockData
+  toneInsights?: ToneInsights
 }
 
 export type NewsItem = {
@@ -61,7 +63,26 @@ export type IntelligenceSources = {
   news: number
   jobs: number
   technologies: number
+  stockData?: boolean
+  toneAnalysis?: boolean
   builtWithUsed: boolean
+}
+
+export type StockData = {
+  ticker?: string
+  currentPrice?: string
+  priceChange?: string
+  priceHistory?: Array<{ date: string; value: number }>
+  marketCap?: string
+  volume?: string
+}
+
+export type ToneInsights = {
+  emotion?: string
+  confidence?: number
+  mood?: string
+  sentiment?: 'positive' | 'negative' | 'neutral'
+  emotions?: Array<{ name: string; score: number }>
 }
 
 export type CreateBriefRequest = {
@@ -127,6 +148,8 @@ export const briefsService = {
         companyLogo: brief.companyLogo,
         hiringTrends: brief.hiringTrends,
         newsTrends: brief.newsTrends,
+        stockData: brief.stockData,
+        toneInsights: brief.toneInsights,
         userId: userId
       })
       .select()

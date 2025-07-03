@@ -4,7 +4,7 @@ import { AuthGuard } from './components/AuthGuard'
 import { Landing } from './pages/Landing'
 import { App as AppPage } from './pages/App'
 import { BriefDetail } from './pages/BriefDetail'
-import { Dashboard } from './pages/Dashboard'
+import { Analytics } from './pages/Analytics'
 import { Settings } from './pages/Settings'
 import { Docs } from './pages/Docs'
 
@@ -25,9 +25,9 @@ function App() {
               <BriefDetail />
             </AuthGuard>
           } />
-          <Route path="/dashboard" element={
+          <Route path="/analytics" element={
             <AuthGuard>
-              <Dashboard />
+              <Analytics />
             </AuthGuard>
           } />
           <Route path="/settings" element={

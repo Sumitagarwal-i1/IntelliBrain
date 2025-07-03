@@ -44,7 +44,7 @@ export function Login() {
     setError('')
     
     try {
-      const { error } = await signIn('demo@intellibrief.ai', 'demo123')
+      const { error } = await signIn('demo@pitchintel.ai', 'demo123')
       if (error) {
         setError('Demo login failed. Please try again.')
       }
@@ -57,7 +57,7 @@ export function Login() {
 
   if (showConfirmation) {
     return (
-      <div className="min-h-screen bg-gray-950 flex items-center justify-center px-4">
+      <div className="min-h-screen bg-black flex items-center justify-center px-4">
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -88,7 +88,7 @@ export function Login() {
                 setEmail('')
                 setPassword('')
               }}
-              className="w-full bg-primary-600 hover:bg-primary-500 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
+              className="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
             >
               Back to Sign In
             </button>
@@ -99,7 +99,7 @@ export function Login() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-950 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-black flex items-center justify-center px-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -110,12 +110,12 @@ export function Login() {
           <div className="text-center mb-8">
             <motion.div
               whileHover={{ scale: 1.05, rotate: 5 }}
-              className="w-16 h-16 bg-primary-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg"
+              className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg"
             >
               <Brain className="w-8 h-8 text-white" />
             </motion.div>
             <h1 className="text-2xl font-bold text-white mb-2">
-              Welcome to IntelliBrief
+              Welcome to PitchIntel
             </h1>
             <p className="text-gray-400">
               {isSignUp ? 'Create your account' : 'Sign in to your account'}
@@ -147,7 +147,7 @@ export function Login() {
               </button>
             </div>
             <p className="text-xs text-blue-400/80">
-              Email: demo@intellibrief.ai<br />
+              Email: demo@pitchintel.ai<br />
               Password: demo123
             </p>
           </div>
@@ -163,7 +163,7 @@ export function Login() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-4 py-3 pl-12 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="w-full px-4 py-3 pl-12 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="Enter your email"
                   required
                 />
@@ -180,7 +180,7 @@ export function Login() {
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-4 py-3 pl-12 pr-12 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="w-full px-4 py-3 pl-12 pr-12 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="Enter your password"
                   required
                   minLength={6}
@@ -201,7 +201,7 @@ export function Login() {
               disabled={loading}
               whileHover={{ scale: loading ? 1 : 1.02 }}
               whileTap={{ scale: loading ? 1 : 0.98 }}
-              className="w-full bg-primary-600 hover:bg-primary-500 text-white font-semibold py-3 px-6 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-3 px-6 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               {loading ? (
                 <>
@@ -221,7 +221,7 @@ export function Login() {
                 setIsSignUp(!isSignUp)
                 setError('')
               }}
-              className="text-primary-400 hover:text-primary-300 transition-colors"
+              className="text-blue-400 hover:text-blue-300 transition-colors"
             >
               {isSignUp 
                 ? 'Already have an account? Sign in' 

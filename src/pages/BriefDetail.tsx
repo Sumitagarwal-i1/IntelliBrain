@@ -3,22 +3,12 @@ import { useParams, Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { 
   ArrowLeft, 
-  Copy, 
-  CheckCircle, 
-  Newspaper,
-  Code,
-  Target,
-  AlertTriangle,
-  Mail,
-  Brain,
-  Users,
-  Sparkles
+  Zap,
+  RefreshCw
 } from 'lucide-react'
 import { Brief, briefsService } from '../lib/supabase'
 import { BriefSidebar } from '../components/BriefSidebar'
-import { NewsCard } from '../components/NewsCard'
-import { HiringChart } from '../components/HiringChart'
-import { RetryBriefButton } from '../components/RetryBriefButton'
+import { BriefTabs } from '../components/BriefTabs'
 import { Navigation } from '../components/Navigation'
 import { LoadingSpinner } from '../components/LoadingSpinner'
 import { useAuth } from '../contexts/AuthContext'
@@ -28,8 +18,8 @@ export function BriefDetail() {
   const { user } = useAuth()
   const [brief, setBrief] = useState<Brief | null>(null)
   const [loading, setLoading] = useState(true)
-  const [copiedField, setCopiedField] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [isImproving, setIsImproving] = useState(false)
 
   useEffect(() => {
     if (id && user) {
@@ -55,19 +45,33 @@ export function BriefDetail() {
     }
   }
 
-  const copyToClipboard = async (text: string, field: string) => {
+  const handleImproveBrief = async () => {
+    if (!brief) return
+    
+    setIsImproving(true)
     try {
-      await navigator.clipboard.writeText(text)
-      setCopiedField(field)
-      setTimeout(() => setCopiedField(null), 2000)
-    } catch (err) {
-      console.error('Failed to copy text: ', err)
-    }
-  }
+      // Call the improve brief API
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/improve-brief`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+        },
+        body: JSON.stringify({
+          briefId: brief.id,
+          userId: user?.id
+        }),
+      })
 
-  const handleRetryBrief = async (briefId: string) => {
-    // Implement retry logic here
-    console.log('Retrying brief:', briefId)
+      if (response.ok) {
+        // Reload the brief to get updated data
+        await loadBrief(brief.id)
+      }
+    } catch (error) {
+      console.error('Failed to improve brief:', error)
+    } finally {
+      setIsImproving(false)
+    }
   }
 
   if (loading) {
@@ -76,12 +80,12 @@ export function BriefDetail() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-950 text-white">
+      <div className="min-h-screen bg-black text-white">
         <Navigation />
         <div className="pt-24 container mx-auto px-4 py-24">
           <div className="text-center">
             <h1 className="text-2xl font-bold text-white mb-4">{error}</h1>
-            <Link to="/app" className="text-primary-400 hover:text-primary-300">
+            <Link to="/app" className="text-blue-400 hover:text-blue-300">
               ← Back to Briefs
             </Link>
           </div>
@@ -92,12 +96,12 @@ export function BriefDetail() {
 
   if (!brief) {
     return (
-      <div className="min-h-screen bg-gray-950 text-white">
+      <div className="min-h-screen bg-black text-white">
         <Navigation />
         <div className="pt-24 container mx-auto px-4 py-24">
           <div className="text-center">
             <h1 className="text-2xl font-bold text-white mb-4">Brief Not Found</h1>
-            <Link to="/app" className="text-primary-400 hover:text-primary-300">
+            <Link to="/app" className="text-blue-400 hover:text-blue-300">
               ← Back to Briefs
             </Link>
           </div>
@@ -107,7 +111,7 @@ export function BriefDetail() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
+    <div className="min-h-screen bg-black text-white">
       <Navigation />
       
       <div className="pt-24 container mx-auto px-4 py-8">
@@ -120,10 +124,6 @@ export function BriefDetail() {
             <ArrowLeft className="w-5 h-5" />
             Back to Briefs
           </Link>
-          
-          <div className="flex items-center gap-4">
-            <RetryBriefButton briefId={brief.id} onRetry={handleRetryBrief} />
-          </div>
         </div>
 
         <div className="grid lg:grid-cols-4 gap-8">
@@ -133,184 +133,31 @@ export function BriefDetail() {
           </div>
 
           {/* Main Content */}
-          <div className="lg:col-span-3 order-1 lg:order-2 space-y-8">
-            {/* Strategic Summary */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="bg-gray-900 border border-gray-800 rounded-2xl p-8"
-            >
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-white flex items-center gap-3">
-                  <Brain className="w-6 h-6 text-primary-400" />
-                  Strategic Intelligence Summary
-                </h2>
-              </div>
-              <div className="bg-primary-500/10 border border-primary-500/20 rounded-xl p-6">
-                <p className="text-gray-300 leading-relaxed text-lg">{brief.summary}</p>
-              </div>
-            </motion.div>
-
-            {/* Pitch Strategy */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-              className="bg-gray-900 border border-gray-800 rounded-2xl p-8"
-            >
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-white flex items-center gap-3">
-                  <Target className="w-6 h-6 text-violet-400" />
-                  Personalized Pitch Strategy
-                </h2>
-                <button
-                  onClick={() => copyToClipboard(brief.pitchAngle, 'pitch')}
-                  className="flex items-center gap-2 px-4 py-2 bg-violet-600 hover:bg-violet-500 text-white rounded-lg transition-all duration-200 font-medium shadow-lg hover:shadow-violet-500/25"
-                >
-                  {copiedField === 'pitch' ? (
-                    <><CheckCircle className="w-4 h-4" /> Copied!</>
-                  ) : (
-                    <><Copy className="w-4 h-4" /> Copy Pitch</>
-                  )}
-                </button>
-              </div>
-              <div className="bg-violet-500/10 border border-violet-500/20 rounded-xl p-6">
-                <p className="text-gray-300 leading-relaxed text-lg whitespace-pre-line">{brief.pitchAngle}</p>
-              </div>
-            </motion.div>
-
-            {/* Subject Line */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className="bg-gray-900 border border-gray-800 rounded-2xl p-8"
-            >
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-white flex items-center gap-3">
-                  <Mail className="w-6 h-6 text-accent-400" />
-                  Ready-to-Use Subject Line
-                </h2>
-                <button
-                  onClick={() => copyToClipboard(brief.subjectLine, 'subject')}
-                  className="flex items-center gap-2 px-4 py-2 bg-accent-600 hover:bg-accent-500 text-white rounded-lg transition-colors font-medium"
-                >
-                  {copiedField === 'subject' ? (
-                    <><CheckCircle className="w-4 h-4" /> Copied!</>
-                  ) : (
-                    <><Copy className="w-4 h-4" /> Copy Subject</>
-                  )}
-                </button>
-              </div>
-              <div className="bg-accent-500/10 border border-accent-500/20 rounded-xl p-6">
-                <p className="text-gray-300 font-semibold text-lg">"{brief.subjectLine}"</p>
-              </div>
-            </motion.div>
-
-            {/* What NOT to Pitch */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              className="bg-gray-900 border border-gray-800 rounded-2xl p-8"
-            >
-              <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
-                <AlertTriangle className="w-6 h-6 text-red-400" />
-                Strategic Warnings - What NOT to Pitch
-              </h2>
-              <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-6">
-                <p className="text-gray-300 leading-relaxed text-lg">{brief.whatNotToPitch}</p>
-              </div>
-            </motion.div>
-
-            {/* News Intelligence */}
-            {brief.news && brief.news.length > 0 && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4 }}
-                className="bg-gray-900 border border-gray-800 rounded-2xl p-8"
-              >
-                <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
-                  <Newspaper className="w-6 h-6 text-green-400" />
-                  Live News Intelligence
-                  <span className="text-sm bg-green-500/20 text-green-300 px-3 py-1 rounded-full">
-                    {brief.news.length} sources
-                  </span>
-                </h2>
-                <div className="space-y-4">
-                  {brief.news.map((newsItem, index) => (
-                    <NewsCard key={index} news={newsItem} index={index} />
-                  ))}
-                </div>
-              </motion.div>
-            )}
-
-            {/* Hiring Intelligence */}
-            {brief.jobSignals && brief.jobSignals.length > 0 && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5 }}
-                className="bg-gray-900 border border-gray-800 rounded-2xl p-8"
-              >
-                <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
-                  <Users className="w-6 h-6 text-blue-400" />
-                  Hiring Intelligence
-                  <span className="text-sm bg-blue-500/20 text-blue-300 px-3 py-1 rounded-full">
-                    {brief.jobSignals.length} positions
-                  </span>
-                </h2>
-                <HiringChart jobSignals={brief.jobSignals} />
-              </motion.div>
-            )}
-
-            {/* Tech Stack */}
-            {brief.techStack && brief.techStack.length > 0 && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.6 }}
-                className="bg-gray-900 border border-gray-800 rounded-2xl p-8"
-              >
-                <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
-                  <Code className="w-6 h-6 text-purple-400" />
-                  Technology Stack Analysis
-                  <span className="text-sm bg-purple-500/20 text-purple-300 px-3 py-1 rounded-full">
-                    {brief.techStack.length} detected
-                  </span>
-                </h2>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                  {brief.techStack.map((tech, index) => (
-                    <motion.div
-                      key={index}
-                      initial={{ opacity: 0, scale: 0.9 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ delay: 0.7 + index * 0.05 }}
-                      className="bg-purple-500/10 border border-purple-500/20 rounded-lg p-4 text-center hover:bg-purple-500/20 transition-colors"
-                    >
-                      <span className="text-purple-300 font-medium">{tech}</span>
-                    </motion.div>
-                  ))}
-                </div>
-              </motion.div>
-            )}
-
-            {/* User Intent Context */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.7 }}
-              className="bg-gray-800/30 rounded-xl p-6 border border-gray-700"
-            >
-              <h3 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-primary-400" />
-                Your Original Intent
-              </h3>
-              <p className="text-gray-400 italic">"{brief.userIntent}"</p>
-            </motion.div>
+          <div className="lg:col-span-3 order-1 lg:order-2">
+            <BriefTabs brief={brief} />
           </div>
         </div>
+
+        {/* Floating Improve Button */}
+        <motion.button
+          onClick={handleImproveBrief}
+          disabled={isImproving}
+          whileHover={{ scale: isImproving ? 1 : 1.05 }}
+          whileTap={{ scale: isImproving ? 1 : 0.95 }}
+          className="fixed bottom-8 right-8 flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white rounded-full font-medium shadow-2xl hover:shadow-purple-500/25 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed z-50"
+        >
+          {isImproving ? (
+            <>
+              <RefreshCw className="w-5 h-5 animate-spin" />
+              Improving Brief...
+            </>
+          ) : (
+            <>
+              <Zap className="w-5 h-5" />
+              Improve This Brief
+            </>
+          )}
+        </motion.button>
       </div>
     </div>
   )

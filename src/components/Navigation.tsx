@@ -27,7 +27,7 @@ export function Navigation() {
   const [isProfileOpen, setIsProfileOpen] = useState(false)
 
   const navItems = [
-    { path: '/', label: 'Home', icon: Home },
+    // { path: '/', label: 'Home', icon: Home }
     { path: '/app', label: 'Briefs', icon: FileText },
     { path: '/analytics', label: 'Analytics', icon: BarChart3 },
     { path: '/pricing', label: 'Pricing', icon: DollarSign },

@@ -4,11 +4,13 @@ import { motion } from 'framer-motion'
 import { 
   ArrowLeft, 
   Zap,
-  RefreshCw
+  RefreshCw,
+  Share2
 } from 'lucide-react'
 import { Brief, briefsService } from '../lib/supabase'
-import { BriefSidebar } from '../components/BriefSidebar'
+import { BriefOverview } from '../components/BriefOverview'
 import { BriefTabs } from '../components/BriefTabs'
+import { ShareModal } from '../components/ShareModal'
 import { Navigation } from '../components/Navigation'
 import { LoadingSpinner } from '../components/LoadingSpinner'
 import { useAuth } from '../contexts/AuthContext'
@@ -20,6 +22,7 @@ export function BriefDetail() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [isImproving, setIsImproving] = useState(false)
+  const [showShareModal, setShowShareModal] = useState(false)
 
   useEffect(() => {
     if (id && user) {
@@ -114,7 +117,7 @@ export function BriefDetail() {
     <div className="min-h-screen bg-black text-white">
       <Navigation />
       
-      <div className="pt-24 container mx-auto px-4 py-8">
+      <div className="pt-24 container mx-auto px-4 py-8 max-w-7xl">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <Link 
@@ -124,17 +127,31 @@ export function BriefDetail() {
             <ArrowLeft className="w-5 h-5" />
             Back to Briefs
           </Link>
+          
+          <button
+            onClick={() => setShowShareModal(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl transition-colors font-medium"
+          >
+            <Share2 className="w-4 h-4" />
+            Share
+          </button>
         </div>
 
-        <div className="grid lg:grid-cols-4 gap-8">
-          {/* Sidebar */}
-          <div className="lg:col-span-1 order-2 lg:order-1">
-            <BriefSidebar brief={brief} />
+        {/* Company Overview - Horizontal Layout */}
+        <div className="mb-8">
+          <BriefOverview brief={brief} />
+        </div>
+
+        {/* Two-Column Layout: Vertical Tabs + Content */}
+        <div className="grid lg:grid-cols-5 gap-8">
+          {/* Left Column - Vertical Tab Navigation */}
+          <div className="lg:col-span-1">
+            <BriefTabs brief={brief} layout="vertical" />
           </div>
 
-          {/* Main Content */}
-          <div className="lg:col-span-3 order-1 lg:order-2">
-            <BriefTabs brief={brief} />
+          {/* Right Column - Tab Content */}
+          <div className="lg:col-span-4">
+            <BriefTabs brief={brief} layout="content" />
           </div>
         </div>
 
@@ -158,6 +175,13 @@ export function BriefDetail() {
             </>
           )}
         </motion.button>
+
+        {/* Share Modal */}
+        <ShareModal 
+          brief={brief}
+          isOpen={showShareModal}
+          onClose={() => setShowShareModal(false)}
+        />
       </div>
     </div>
   )

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Plus, History, ArrowLeft, Sparkles, Download } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
+import { Plus, History, ArrowLeft, Sparkles, Download, Crown } from 'lucide-react'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { BriefForm } from '../components/BriefForm'
 import { AnalyzingScreen } from '../components/AnalyzingScreen'
 import { BriefCard } from '../components/BriefCard'
@@ -12,10 +12,12 @@ import { LoadingSpinner } from '../components/LoadingSpinner'
 import { Brief, CreateBriefRequest, briefsService } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 import { exportToPDF, exportToCSV } from '../utils/exportUtils'
+import { Link } from 'react-router-dom'
 
 export function App() {
   const navigate = useNavigate()
   const { user } = useAuth()
+  const [searchParams] = useSearchParams()
   const [briefs, setBriefs] = useState<Brief[]>([])
   const [selectedBrief, setSelectedBrief] = useState<Brief | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -29,7 +31,12 @@ export function App() {
     if (user) {
       loadBriefs()
     }
-  }, [user])
+    
+    // Check if we should show the form immediately
+    if (searchParams.get('new') === 'true') {
+      setShowForm(true)
+    }
+  }, [user, searchParams])
 
   const loadBriefs = async () => {
     try {
@@ -44,7 +51,16 @@ export function App() {
     }
   }
 
-  const handleCreateBrief = async (requestData: CreateBriefRequest) => {
+  const handleCreateBrief = async (requestData: CreateBriefRequest & { 
+    userCompany?: {
+      name: string
+      industry: string
+      product: string
+      valueProposition: string
+      website?: string
+      goals: string
+    }
+  }) => {
     setIsLoading(true)
     setIsAnalyzing(true)
     setCurrentAnalysis({ companyName: requestData.companyName, website: requestData.website })
@@ -122,6 +138,8 @@ export function App() {
   const handleBackToList = () => {
     setShowForm(false)
     setError(null)
+    // Clear the URL parameter
+    navigate('/app', { replace: true })
   }
 
   const handleCloseModal = () => {
@@ -134,7 +152,7 @@ export function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-950">
+    <div className="min-h-screen bg-black">
       <Navigation />
 
       <div className="pt-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -185,7 +203,7 @@ export function App() {
                   <h1 className="text-4xl font-bold text-white mb-2 flex items-center gap-3">
                     Your Strategic Briefs
                     {briefs.length > 0 && (
-                      <span className="inline-flex items-center gap-1 bg-primary-500/20 text-primary-300 px-3 py-1 rounded-full text-sm font-medium">
+                      <span className="inline-flex items-center gap-1 bg-blue-500/20 text-blue-300 px-3 py-1 rounded-full text-sm font-medium">
                         <Sparkles className="w-4 h-4" />
                         {briefs.length} generated
                       </span>
@@ -199,6 +217,15 @@ export function App() {
                   </p>
                 </div>
                 <div className="flex items-center gap-4">
+                  {/* Upgrade CTA */}
+                  <Link
+                    to="/pricing"
+                    className="hidden sm:flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white rounded-xl transition-all duration-200 font-medium text-sm shadow-lg hover:shadow-purple-500/25"
+                  >
+                    <Crown className="w-4 h-4" />
+                    Upgrade for Unlimited
+                  </Link>
+
                   {briefs.length > 0 && (
                     <div className="flex items-center gap-2">
                       <button
@@ -223,7 +250,7 @@ export function App() {
                   </div>
                   <button
                     onClick={handleShowForm}
-                    className="flex items-center gap-2 bg-primary-600 hover:bg-primary-500 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 shadow-lg hover:shadow-primary-500/25"
+                    className="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 shadow-lg hover:shadow-blue-500/25"
                   >
                     <Plus className="w-4 h-4" />
                     New Brief

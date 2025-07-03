@@ -17,7 +17,8 @@ import {
   BarChart3,
   PieChart,
   Heart,
-  DollarSign
+  DollarSign,
+  ChevronDown
 } from 'lucide-react'
 import { Brief } from '../lib/supabase'
 import { NewsCard } from './NewsCard'
@@ -29,11 +30,13 @@ import { IntelligenceSources } from './IntelligenceSources'
 
 interface BriefTabsProps {
   brief: Brief
+  layout?: 'vertical' | 'content' | 'horizontal'
 }
 
-export function BriefTabs({ brief }: BriefTabsProps) {
+export function BriefTabs({ brief, layout = 'horizontal' }: BriefTabsProps) {
   const [activeTab, setActiveTab] = useState('summary')
   const [copiedField, setCopiedField] = useState<string | null>(null)
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   const copyToClipboard = async (text: string, field: string) => {
     try {
@@ -113,15 +116,15 @@ export function BriefTabs({ brief }: BriefTabsProps) {
 
   const getTabColor = (color: string, isActive: boolean) => {
     const colors = {
-      blue: isActive ? 'bg-blue-500/20 text-blue-300 border-blue-500/30' : 'text-gray-400 hover:text-blue-300',
-      purple: isActive ? 'bg-purple-500/20 text-purple-300 border-purple-500/30' : 'text-gray-400 hover:text-purple-300',
-      green: isActive ? 'bg-green-500/20 text-green-300 border-green-500/30' : 'text-gray-400 hover:text-green-300',
-      red: isActive ? 'bg-red-500/20 text-red-300 border-red-500/30' : 'text-gray-400 hover:text-red-300',
-      emerald: isActive ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30' : 'text-gray-400 hover:text-emerald-300',
-      violet: isActive ? 'bg-violet-500/20 text-violet-300 border-violet-500/30' : 'text-gray-400 hover:text-violet-300',
-      orange: isActive ? 'bg-orange-500/20 text-orange-300 border-orange-500/30' : 'text-gray-400 hover:text-orange-300',
-      pink: isActive ? 'bg-pink-500/20 text-pink-300 border-pink-500/30' : 'text-gray-400 hover:text-pink-300',
-      gray: isActive ? 'bg-gray-500/20 text-gray-300 border-gray-500/30' : 'text-gray-400 hover:text-gray-300'
+      blue: isActive ? 'bg-blue-500/20 text-blue-300 border-blue-500/30' : 'text-gray-400 hover:text-blue-300 hover:bg-blue-500/10',
+      purple: isActive ? 'bg-purple-500/20 text-purple-300 border-purple-500/30' : 'text-gray-400 hover:text-purple-300 hover:bg-purple-500/10',
+      green: isActive ? 'bg-green-500/20 text-green-300 border-green-500/30' : 'text-gray-400 hover:text-green-300 hover:bg-green-500/10',
+      red: isActive ? 'bg-red-500/20 text-red-300 border-red-500/30' : 'text-gray-400 hover:text-red-300 hover:bg-red-500/10',
+      emerald: isActive ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30' : 'text-gray-400 hover:text-emerald-300 hover:bg-emerald-500/10',
+      violet: isActive ? 'bg-violet-500/20 text-violet-300 border-violet-500/30' : 'text-gray-400 hover:text-violet-300 hover:bg-violet-500/10',
+      orange: isActive ? 'bg-orange-500/20 text-orange-300 border-orange-500/30' : 'text-gray-400 hover:text-orange-300 hover:bg-orange-500/10',
+      pink: isActive ? 'bg-pink-500/20 text-pink-300 border-pink-500/30' : 'text-gray-400 hover:text-pink-300 hover:bg-pink-500/10',
+      gray: isActive ? 'bg-gray-500/20 text-gray-300 border-gray-500/30' : 'text-gray-400 hover:text-gray-300 hover:bg-gray-500/10'
     }
     return colors[color as keyof typeof colors] || colors.gray
   }
@@ -357,6 +360,103 @@ export function BriefTabs({ brief }: BriefTabsProps) {
     }
   }
 
+  // Vertical Tab Navigation (Left Sidebar)
+  if (layout === 'vertical') {
+    return (
+      <div className="space-y-2">
+        {/* Mobile Dropdown */}
+        <div className="lg:hidden">
+          <button
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="w-full flex items-center justify-between px-4 py-3 bg-gray-800 rounded-xl text-white font-medium"
+          >
+            <span>{tabs.find(tab => tab.id === activeTab)?.label}</span>
+            <ChevronDown className={`w-4 h-4 transition-transform ${isMobileMenuOpen ? 'rotate-180' : ''}`} />
+          </button>
+          
+          <AnimatePresence>
+            {isMobileMenuOpen && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="mt-2 space-y-1 bg-gray-800 rounded-xl p-2"
+              >
+                {tabs.map((tab) => {
+                  const Icon = tab.icon
+                  const isActive = activeTab === tab.id
+                  
+                  return (
+                    <button
+                      key={tab.id}
+                      onClick={() => {
+                        setActiveTab(tab.id)
+                        setIsMobileMenuOpen(false)
+                      }}
+                      className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-all duration-200 text-left ${
+                        isActive 
+                          ? `${getTabColor(tab.color, true)} border` 
+                          : getTabColor(tab.color, false)
+                      }`}
+                    >
+                      <Icon className="w-4 h-4" />
+                      <span className="flex-1">{tab.label}</span>
+                      {tab.count !== undefined && tab.count > 0 && (
+                        <span className="bg-current/20 text-current px-2 py-0.5 rounded-full text-xs font-medium">
+                          {tab.count}
+                        </span>
+                      )}
+                    </button>
+                  )
+                })}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
+        {/* Desktop Vertical Navigation */}
+        <div className="hidden lg:block space-y-2 max-h-[calc(100vh-200px)] overflow-y-auto">
+          {tabs.map((tab) => {
+            const Icon = tab.icon
+            const isActive = activeTab === tab.id
+            
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 text-left ${
+                  isActive 
+                    ? `${getTabColor(tab.color, true)} border` 
+                    : getTabColor(tab.color, false)
+                }`}
+              >
+                <Icon className="w-5 h-5" />
+                <span className="flex-1">{tab.label}</span>
+                {tab.count !== undefined && tab.count > 0 && (
+                  <span className="bg-current/20 text-current px-2 py-0.5 rounded-full text-xs font-medium">
+                    {tab.count}
+                  </span>
+                )}
+              </button>
+            )
+          })}
+        </div>
+      </div>
+    )
+  }
+
+  // Content Area (Right Side)
+  if (layout === 'content') {
+    return (
+      <div className="min-h-[600px]">
+        <AnimatePresence mode="wait">
+          {renderTabContent()}
+        </AnimatePresence>
+      </div>
+    )
+  }
+
+  // Horizontal Layout (Default)
   return (
     <div className="space-y-6">
       {/* Tab Navigation */}

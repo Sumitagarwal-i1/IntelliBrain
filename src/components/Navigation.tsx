@@ -14,7 +14,9 @@ import {
   BookOpen,
   ExternalLink,
   Plus,
-  ChevronDown
+  ChevronDown,
+  DollarSign,
+  Crown
 } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 
@@ -28,6 +30,7 @@ export function Navigation() {
     { path: '/', label: 'Home', icon: Home },
     { path: '/app', label: 'Briefs', icon: FileText },
     { path: '/analytics', label: 'Analytics', icon: BarChart3 },
+    { path: '/pricing', label: 'Pricing', icon: DollarSign },
     { path: '/docs', label: 'Docs', icon: BookOpen }
   ]
 
@@ -83,12 +86,21 @@ export function Navigation() {
                 </Link>
               )
             })}
-            
-            
           </div>
 
           {/* Right Side Actions */}
           <div className="flex items-center gap-3">
+            {/* Upgrade Button */}
+            {user && (
+              <Link
+                to="/pricing"
+                className="hidden sm:flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white rounded-xl font-medium transition-all duration-200 shadow-lg hover:shadow-purple-500/25"
+              >
+                <Crown className="w-4 h-4" />
+                Upgrade
+              </Link>
+            )}
+
             {/* Built with Bolt.new Badge */}
             <a
               href="https://bolt.new"
@@ -128,6 +140,14 @@ export function Navigation() {
                         <div className="text-sm font-medium text-white">{user.email?.split('@')[0]}</div>
                         <div className="text-xs text-gray-400">{user.email}</div>
                       </div>
+                      <Link
+                        to="/pricing"
+                        className="w-full flex items-center gap-3 px-4 py-2 text-sm text-purple-300 hover:bg-gray-800/50 hover:text-purple-200 transition-colors"
+                        onClick={() => setIsProfileOpen(false)}
+                      >
+                        <Crown className="w-4 h-4" />
+                        Upgrade Plan
+                      </Link>
                       <Link
                         to="/settings"
                         className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-300 hover:bg-gray-800/50 hover:text-white transition-colors"
@@ -193,14 +213,24 @@ export function Navigation() {
                 })}
                 
                 {user && (
-                  <Link
-                    to="/app?new=true"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className="flex items-center gap-3 px-4 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-medium transition-all duration-200"
-                  >
-                    <Plus className="w-5 h-5" />
-                    New Brief
-                  </Link>
+                  <>
+                    <Link
+                      to="/pricing"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white rounded-xl font-medium transition-all duration-200"
+                    >
+                      <Crown className="w-5 h-5" />
+                      Upgrade Plan
+                    </Link>
+                    <Link
+                      to="/app?new=true"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="flex items-center gap-3 px-4 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-medium transition-all duration-200"
+                    >
+                      <Plus className="w-5 h-5" />
+                      New Brief
+                    </Link>
+                  </>
                 )}
               </div>
             </motion.div>

@@ -7,6 +7,7 @@ import { BriefDetail } from './pages/BriefDetail'
 import { Analytics } from './pages/Analytics'
 import { Settings } from './pages/Settings'
 import { Docs } from './pages/Docs'
+import { Pricing } from './pages/Pricing'
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/docs" element={<Docs />} />
+          <Route path="/pricing" element={<Pricing />} />
           <Route path="/app" element={
             <AuthGuard>
               <AppPage />

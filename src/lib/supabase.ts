@@ -89,6 +89,14 @@ export type CreateBriefRequest = {
   companyName: string
   website?: string
   userIntent: string
+  userCompany?: {
+    name: string
+    industry: string
+    product: string
+    valueProposition: string
+    website?: string
+    goals: string
+  }
 }
 
 // Database operations with user isolation

@@ -1,10 +1,22 @@
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Building2, Globe, Target, Loader2, Sparkles } from 'lucide-react'
+import { Building2, Globe, Target, Loader2, Sparkles, User, Briefcase, ChevronDown, ChevronUp } from 'lucide-react'
 import { CompanyAutocomplete } from './CompanyAutocomplete'
 
 interface BriefFormProps {
-  onSubmit: (data: { companyName: string; website?: string; userIntent: string }) => void
+  onSubmit: (data: { 
+    companyName: string
+    website?: string
+    userIntent: string
+    userCompany?: {
+      name: string
+      industry: string
+      product: string
+      valueProposition: string
+      website?: string
+      goals: string
+    }
+  }) => void
   isLoading: boolean
 }
 
@@ -14,7 +26,18 @@ export function BriefForm({ onSubmit, isLoading }: BriefFormProps) {
     website: '',
     userIntent: ''
   })
+  
+  const [userCompanyData, setUserCompanyData] = useState({
+    name: '',
+    industry: '',
+    product: '',
+    valueProposition: '',
+    website: '',
+    goals: ''
+  })
+  
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const [showUserCompany, setShowUserCompany] = useState(false)
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {}
@@ -32,6 +55,19 @@ export function BriefForm({ onSubmit, isLoading }: BriefFormProps) {
     if (formData.website && !formData.website.match(/^https?:\/\/.+/)) {
       newErrors.website = 'Please enter a valid URL (starting with http:// or https://)'
     }
+
+    // Validate user company if section is expanded
+    if (showUserCompany) {
+      if (!userCompanyData.name.trim()) {
+        newErrors.userCompanyName = 'Your company name is required'
+      }
+      if (!userCompanyData.industry.trim()) {
+        newErrors.userCompanyIndustry = 'Industry is required'
+      }
+      if (!userCompanyData.product.trim()) {
+        newErrors.userCompanyProduct = 'Product/service description is required'
+      }
+    }
     
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
@@ -43,7 +79,15 @@ export function BriefForm({ onSubmit, isLoading }: BriefFormProps) {
       onSubmit({
         companyName: formData.companyName.trim(),
         website: formData.website.trim() || undefined,
-        userIntent: formData.userIntent.trim()
+        userIntent: formData.userIntent.trim(),
+        userCompany: showUserCompany && userCompanyData.name ? {
+          name: userCompanyData.name.trim(),
+          industry: userCompanyData.industry.trim(),
+          product: userCompanyData.product.trim(),
+          valueProposition: userCompanyData.valueProposition.trim(),
+          website: userCompanyData.website.trim() || undefined,
+          goals: userCompanyData.goals.trim()
+        } : undefined
       })
     }
   }
@@ -60,24 +104,24 @@ export function BriefForm({ onSubmit, isLoading }: BriefFormProps) {
   }
 
   const intentExamples = [
-    "Pitch our AI-powered analytics platform to help them optimize their data pipeline and reduce infrastructure costs",
-    "Introduce our cybersecurity solution to protect their growing remote workforce and cloud infrastructure",
-    "Present our customer success platform to help them scale their support operations and improve retention",
-    "Offer our DevOps automation tools to streamline their deployment process and reduce time-to-market"
+    "As a DevOps automation platform, I want to pitch our CI/CD solution to help them streamline their deployment process and reduce time-to-market for their growing engineering team",
+    "Our AI-powered analytics platform can help them optimize their data pipeline, reduce infrastructure costs, and improve decision-making speed as they scale",
+    "I want to introduce our cybersecurity solution to protect their expanding remote workforce and cloud infrastructure during their growth phase",
+    "As a customer success platform provider, I want to help them scale their support operations, improve retention rates, and handle their increasing customer base more efficiently"
   ]
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="max-w-3xl mx-auto"
+      className="max-w-4xl mx-auto"
     >
       <div className="bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-2xl p-8">
         <div className="text-center mb-8">
           <motion.div
             initial={{ scale: 0.9 }}
             animate={{ scale: 1 }}
-            className="w-16 h-16 bg-gradient-to-r from-primary-500 to-violet-500 rounded-2xl flex items-center justify-center mx-auto mb-4"
+            className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4"
           >
             <Sparkles className="w-8 h-8 text-white" />
           </motion.div>
@@ -85,15 +129,129 @@ export function BriefForm({ onSubmit, isLoading }: BriefFormProps) {
             Generate Strategic Intelligence Brief
           </h2>
           <p className="text-gray-400 text-lg">
-            Get real-time insights powered by live data sources and AI analysis
+            Get personalized insights powered by live data sources and AI analysis
           </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-8">
+          {/* Your Company Context (Collapsible) */}
+          <div className="bg-blue-500/5 border border-blue-500/20 rounded-xl p-6">
+            <button
+              type="button"
+              onClick={() => setShowUserCompany(!showUserCompany)}
+              className="w-full flex items-center justify-between text-left"
+            >
+              <div className="flex items-center gap-3">
+                <User className="w-5 h-5 text-blue-400" />
+                <div>
+                  <h3 className="text-lg font-semibold text-white">Your Company Context</h3>
+                  <p className="text-sm text-gray-400">Add your company info for personalized briefs (recommended)</p>
+                </div>
+              </div>
+              {showUserCompany ? (
+                <ChevronUp className="w-5 h-5 text-gray-400" />
+              ) : (
+                <ChevronDown className="w-5 h-5 text-gray-400" />
+              )}
+            </button>
+
+            <motion.div
+              initial={false}
+              animate={{ height: showUserCompany ? 'auto' : 0, opacity: showUserCompany ? 1 : 0 }}
+              className="overflow-hidden"
+            >
+              <div className="pt-6 space-y-6">
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Your Company Name *
+                    </label>
+                    <input
+                      type="text"
+                      value={userCompanyData.name}
+                      onChange={(e) => setUserCompanyData({ ...userCompanyData, name: e.target.value })}
+                      className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                      placeholder="e.g., TechFlow Solutions"
+                      disabled={isLoading}
+                    />
+                    {errors.userCompanyName && (
+                      <p className="text-red-400 text-sm mt-2">{errors.userCompanyName}</p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Industry/Sector *
+                    </label>
+                    <input
+                      type="text"
+                      value={userCompanyData.industry}
+                      onChange={(e) => setUserCompanyData({ ...userCompanyData, industry: e.target.value })}
+                      className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                      placeholder="e.g., SaaS, DevOps, AI/ML, Cybersecurity"
+                      disabled={isLoading}
+                    />
+                    {errors.userCompanyIndustry && (
+                      <p className="text-red-400 text-sm mt-2">{errors.userCompanyIndustry}</p>
+                    )}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Product/Service Overview *
+                  </label>
+                  <textarea
+                    value={userCompanyData.product}
+                    onChange={(e) => setUserCompanyData({ ...userCompanyData, product: e.target.value })}
+                    rows={2}
+                    className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors resize-none"
+                    placeholder="Brief description of what your company offers..."
+                    disabled={isLoading}
+                  />
+                  {errors.userCompanyProduct && (
+                    <p className="text-red-400 text-sm mt-2">{errors.userCompanyProduct}</p>
+                  )}
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Unique Value Proposition
+                    </label>
+                    <textarea
+                      value={userCompanyData.valueProposition}
+                      onChange={(e) => setUserCompanyData({ ...userCompanyData, valueProposition: e.target.value })}
+                      rows={2}
+                      className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors resize-none"
+                      placeholder="What makes you different from competitors..."
+                      disabled={isLoading}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Your Website
+                    </label>
+                    <input
+                      type="url"
+                      value={userCompanyData.website}
+                      onChange={(e) => setUserCompanyData({ ...userCompanyData, website: e.target.value })}
+                      className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                      placeholder="https://yourcompany.com"
+                      disabled={isLoading}
+                    />
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+
+          {/* Target Company */}
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-3">
               <Building2 className="w-4 h-4 inline mr-2" />
-              Company Name *
+              Target Company Name *
             </label>
             <CompanyAutocomplete
               value={formData.companyName}
@@ -112,13 +270,13 @@ export function BriefForm({ onSubmit, isLoading }: BriefFormProps) {
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-3">
               <Globe className="w-4 h-4 inline mr-2" />
-              Website (Optional)
+              Target Company Website (Optional)
             </label>
             <input
               type="url"
               value={formData.website}
               onChange={(e) => setFormData({ ...formData, website: e.target.value })}
-              className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors"
+              className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
               placeholder="https://company.com (auto-filled from company selection)"
               disabled={isLoading}
             />
@@ -136,7 +294,7 @@ export function BriefForm({ onSubmit, isLoading }: BriefFormProps) {
               value={formData.userIntent}
               onChange={(e) => setFormData({ ...formData, userIntent: e.target.value })}
               rows={4}
-              className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors resize-none"
+              className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors resize-none"
               placeholder="Describe what you want to pitch and how it can help them..."
               disabled={isLoading}
             />
@@ -146,7 +304,7 @@ export function BriefForm({ onSubmit, isLoading }: BriefFormProps) {
             
             {/* Intent Examples */}
             <div className="mt-4">
-              <p className="text-gray-500 text-xs mb-3">Example intents:</p>
+              <p className="text-gray-500 text-xs mb-3">Example intents (click to use):</p>
               <div className="grid gap-2">
                 {intentExamples.map((example, index) => (
                   <button
@@ -168,7 +326,7 @@ export function BriefForm({ onSubmit, isLoading }: BriefFormProps) {
             disabled={isLoading}
             whileHover={{ scale: isLoading ? 1 : 1.02 }}
             whileTap={{ scale: isLoading ? 1 : 0.98 }}
-            className="w-full bg-gradient-to-r from-primary-600 to-violet-600 hover:from-primary-500 hover:to-violet-500 text-white font-semibold py-4 px-6 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 text-lg shadow-2xl shadow-primary-500/25"
+            className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-semibold py-4 px-6 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 text-lg shadow-2xl shadow-blue-500/25"
           >
             {isLoading ? (
               <>
@@ -186,21 +344,25 @@ export function BriefForm({ onSubmit, isLoading }: BriefFormProps) {
           {/* Data Sources Preview */}
           <div className="bg-gray-800/30 rounded-xl p-4 border border-gray-700">
             <h4 className="text-sm font-medium text-gray-300 mb-3">Real-Time Data Sources</h4>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
-              <div className="flex items-center gap-2 text-green-400">
-                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-3 text-xs">
+              <div className="flex items-center gap-2 text-emerald-400">
+                <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
                 NewsData.io
               </div>
               <div className="flex items-center gap-2 text-blue-400">
                 <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                BuiltWith API
-              </div>
-              <div className="flex items-center gap-2 text-purple-400">
-                <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
                 JSearch Jobs
               </div>
               <div className="flex items-center gap-2 text-orange-400">
                 <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
+                Yahoo Finance
+              </div>
+              <div className="flex items-center gap-2 text-pink-400">
+                <div className="w-2 h-2 bg-pink-500 rounded-full"></div>
+                Twinword NLP
+              </div>
+              <div className="flex items-center gap-2 text-gray-400">
+                <div className="w-2 h-2 bg-gray-500 rounded-full"></div>
                 Groq AI
               </div>
             </div>

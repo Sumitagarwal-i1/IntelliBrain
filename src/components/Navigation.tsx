@@ -101,16 +101,16 @@ export function Navigation() {
               </Link>
             )}
 
-            {/* Built with Bolt.new Badge */}
-            <a
+            
+            {/* <a
               href="https://bolt.new"
               target="_blank"
               rel="noopener noreferrer"
               className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-orange-500/20 to-red-500/20 border border-orange-500/30 rounded-full text-orange-300 hover:text-orange-200 transition-colors text-xs font-medium"
-            >
-              <span>Built with</span>
+            > */}
+              {/* <span>Built with</span>
               <span className="font-bold">bolt.new</span>
-              <ExternalLink className="w-3 h-3" />
+              <ExternalLink className="w-3 h-3" /> */}
             </a>
 
             {/* Profile Dropdown */}

@@ -68,7 +68,7 @@ export function Navigation() {
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-1">
             {navItems.map((item) => {
-              const Icon = item.icon
+              
               const active = isActive(item.path)
               
               return (
@@ -81,7 +81,7 @@ export function Navigation() {
                       : 'text-gray-400 hover:text-white hover:bg-gray-800/50'
                   }`}
                 >
-                  <Icon className="w-4 h-4" />
+                  {/* <Icon className="w-4 h-4" /> */}
                   {item.label}
                 </Link>
               )
